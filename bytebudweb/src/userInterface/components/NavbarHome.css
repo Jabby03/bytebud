@@ -1,0 +1,288 @@
+/* ByteBud: buyer navbar
+   Theme: white, black, burgundy */
+
+.bb-nav {
+  --bb-burgundy: #7a1230;
+  --bb-burgundy-dark: #5c0d24;
+  --bb-burgundy-soft: #f8eef1;
+  --bb-black: #0e0e10;
+  --bb-text: #131316;
+  --bb-muted: #6b6b76;
+  --bb-border: #e3e1e4;
+  --bb-subtle: #f5f4f5;
+
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--bb-border);
+  backdrop-filter: saturate(1.4) blur(10px);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: var(--bb-text);
+}
+
+.bb-nav *,
+.bb-nav *::before,
+.bb-nav *::after {
+  box-sizing: border-box;
+}
+
+.bb-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1360px;
+  height: 68px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+/* Brand */
+.bb-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.bb-nav-logo,
+.bb-nav-logo-placeholder {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+}
+
+.bb-nav-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.bb-nav-logo-placeholder {
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed #b9b4ba;
+  background: var(--bb-subtle);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--bb-muted);
+}
+
+.bb-nav-name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--bb-black);
+}
+
+/* Links */
+.bb-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+}
+
+.bb-nav-link {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--bb-muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.bb-nav-link:hover {
+  background: var(--bb-subtle);
+  color: var(--bb-text);
+}
+
+.bb-nav-link.is-active {
+  color: var(--bb-burgundy);
+}
+
+/* Right side */
+.bb-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.bb-nav-cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  color: var(--bb-text);
+  transition: background 0.15s;
+}
+
+.bb-nav-cart:hover {
+  background: var(--bb-subtle);
+}
+
+.bb-nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--bb-burgundy);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Account menu */
+.bb-nav-account {
+  position: relative;
+}
+
+.bb-nav-account-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 8px 0 5px;
+  border: 1px solid var(--bb-border);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bb-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.bb-nav-account-btn:hover {
+  border-color: #c9c5ca;
+  background: var(--bb-subtle);
+}
+
+.bb-nav-avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bb-burgundy);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bb-nav-account-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bb-nav-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--bb-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(14, 14, 16, 0.16);
+  animation: bb-nav-pop 0.14s ease-out;
+}
+
+.bb-nav-menu-head {
+  padding: 10px 12px 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--bb-border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bb-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bb-nav-menu-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--bb-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bb-nav-menu-item:hover {
+  background: var(--bb-subtle);
+}
+
+.bb-nav-menu-item.is-danger {
+  color: #b3261e;
+}
+
+/* "Find a Laptop" inside the menu only on small screens */
+.bb-nav-menu-mobile {
+  display: none;
+}
+
+/* Focus */
+.bb-nav a:focus-visible,
+.bb-nav button:focus-visible {
+  outline: 2px solid var(--bb-burgundy);
+  outline-offset: 2px;
+}
+
+@keyframes bb-nav-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .bb-nav-inner {
+    height: 60px;
+    gap: 12px;
+  }
+
+  .bb-nav-links,
+  .bb-nav-account-name {
+    display: none;
+  }
+
+  .bb-nav-account-btn {
+    padding: 0 6px 0 5px;
+  }
+
+  .bb-nav-menu-mobile {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-nav-menu {
+    animation: none;
+  }
+}

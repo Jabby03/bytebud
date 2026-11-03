@@ -1,0 +1,726 @@
+/* ByteBud: Login / Register page
+   Theme: white, black, burgundy */
+
+/* Let the page fill the whole browser window.
+   This overrides the default Vite starter styles (#root max-width, centered body, dark background). */
+html,
+body,
+#root {
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: block;
+  text-align: left;
+  background: #ffffff;
+}
+
+.ap-page {
+  --ap-burgundy: #7a1230;
+  --ap-burgundy-dark: #5c0d24;
+  --ap-burgundy-soft: #f8eef1;
+  --ap-black: #0e0e10;
+  --ap-text: #131316;
+  --ap-muted: #6b6b76;
+  --ap-border: #e3e1e4;
+  --ap-surface: #ffffff;
+  --ap-subtle: #f5f4f5;
+  --ap-danger: #b3261e;
+  --ap-danger-soft: #fdeceb;
+
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  text-align: left;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ap-text);
+  background: var(--ap-surface);
+}
+
+.ap-page *,
+.ap-page *::before,
+.ap-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================
+   Left: form side
+   ========================= */
+
+.ap-form-side {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 4.5vw, 72px) clamp(24px, 3vw, 40px);
+  background: var(--ap-surface);
+}
+
+.ap-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Logo (placeholder + real image share the same slot) */
+.ap-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ap-logo-placeholder {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px dashed #b9b4ba;
+  border-radius: 10px;
+  background: var(--ap-subtle);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ap-muted);
+}
+
+.ap-logo-img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.ap-logo-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ap-black);
+}
+
+/* Form column */
+.ap-form-wrap {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 32px 0;
+}
+
+.ap-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ap-black);
+}
+
+.ap-subtitle {
+  margin: 0 0 28px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ap-muted);
+}
+
+/* Log in | Register toggle */
+.ap-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 24px;
+  background: var(--ap-subtle);
+  border-radius: 12px;
+}
+
+.ap-tab {
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ap-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.ap-tab:hover {
+  color: var(--ap-text);
+}
+
+.ap-tab.is-active {
+  background: var(--ap-surface);
+  color: var(--ap-burgundy);
+  box-shadow: 0 1px 3px rgba(14, 14, 16, 0.14);
+}
+
+/* Fields */
+.ap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ap-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.ap-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ap-text);
+}
+
+.ap-field input[type="text"],
+.ap-field input[type="email"],
+.ap-field input[type="password"] {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--ap-border);
+  border-radius: 10px;
+  background: var(--ap-surface);
+  font: inherit;
+  font-size: 15px;
+  color: var(--ap-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ap-field input::placeholder {
+  color: #a4a1a8;
+}
+
+.ap-field input:hover {
+  border-color: #c9c5ca;
+}
+
+.ap-field input:focus {
+  outline: none;
+  border-color: var(--ap-burgundy);
+  box-shadow: 0 0 0 3px rgba(122, 18, 48, 0.16);
+}
+
+.ap-field input[aria-invalid="true"] {
+  border-color: var(--ap-danger);
+}
+
+.ap-field input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.16);
+}
+
+/* Password with show/hide */
+.ap-password {
+  position: relative;
+}
+
+.ap-password input {
+  padding-right: 48px;
+}
+
+.ap-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ap-muted);
+  cursor: pointer;
+}
+
+.ap-toggle:hover {
+  background: var(--ap-subtle);
+  color: var(--ap-text);
+}
+
+/* Messages */
+.ap-error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ap-danger);
+}
+
+.ap-hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ap-muted);
+}
+
+.ap-alert {
+  padding: 11px 13px;
+  border: 1px solid #f3c5c2;
+  border-radius: 10px;
+  background: var(--ap-danger-soft);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ap-danger);
+}
+
+/* Student checkbox */
+.ap-student {
+  padding: 15px;
+  border: 1px solid var(--ap-border);
+  border-radius: 12px;
+  background: #fbfafb;
+}
+
+.ap-check {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.ap-check input {
+  position: absolute;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.ap-check-box {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1.5px solid #bdb8be;
+  border-radius: 6px;
+  background: var(--ap-surface);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ap-check input:checked + .ap-check-box {
+  border-color: var(--ap-burgundy);
+  background: var(--ap-burgundy)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 10.5l3.2 3.2L15 6.8' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 100% no-repeat;
+}
+
+.ap-check input:focus-visible + .ap-check-box {
+  box-shadow: 0 0 0 3px rgba(122, 18, 48, 0.3);
+}
+
+.ap-check-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ap-text);
+}
+
+.ap-check-text small {
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ap-muted);
+}
+
+.ap-field-nested {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ap-border);
+  animation: ap-fade 0.18s ease-out;
+}
+
+/* Submit */
+.ap-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ap-burgundy);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.ap-submit:hover:not(:disabled) {
+  background: var(--ap-burgundy-dark);
+}
+
+.ap-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.ap-submit:disabled {
+  background: #b7788a;
+  cursor: not-allowed;
+}
+
+.ap-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ap-spin 0.7s linear infinite;
+}
+
+/* Footer switch */
+.ap-switch {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ap-muted);
+}
+
+.ap-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ap-burgundy);
+  cursor: pointer;
+}
+
+.ap-link:hover {
+  text-decoration: underline;
+}
+
+/* Keyboard focus */
+.ap-tab:focus-visible,
+.ap-toggle:focus-visible,
+.ap-submit:focus-visible,
+.ap-link:focus-visible {
+  outline: 2px solid var(--ap-burgundy);
+  outline-offset: 2px;
+}
+
+/* =========================
+   Right: slogan side
+   ========================= */
+
+.ap-hero-side {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: clamp(32px, 5vw, 80px);
+  color: #fff;
+  background: linear-gradient(145deg, #0b0b0d 0%, #2b0a15 42%, #7a1230 100%);
+}
+
+/* Soft burgundy light in the corner */
+.ap-hero-glow {
+  position: absolute;
+  top: -18%;
+  right: -12%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196, 56, 96, 0.5) 0%, rgba(196, 56, 96, 0) 68%);
+  pointer-events: none;
+}
+
+/* Fine ring pattern, bottom-left */
+.ap-hero-side::after {
+  content: "";
+  position: absolute;
+  left: -160px;
+  bottom: -160px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 40px rgba(255, 255, 255, 0.03),
+    0 0 0 80px rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+}
+
+.ap-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 540px;
+}
+
+.ap-slogan {
+  margin: 0 0 20px;
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.ap-slogan-sub {
+  margin: 0 0 36px;
+  max-width: 460px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.ap-points {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 24px 0 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.ap-points li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.ap-points svg {
+  flex: 0 0 auto;
+  color: #e6a2b5;
+}
+
+/* =========================
+   Forgot password
+   ========================= */
+
+/* Label row with the "Forgot password?" link on the right */
+.ap-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ap-forgot {
+  font-size: 13px;
+}
+
+/* Modal */
+.ap-fp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  background: rgba(14, 14, 16, 0.6);
+  animation: ap-fade 0.18s ease-out;
+}
+
+.ap-fp-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 36px 32px 28px;
+  background: var(--ap-surface);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(14, 14, 16, 0.35);
+  animation: ap-rise 0.22s ease-out;
+}
+
+.ap-fp-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ap-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ap-fp-close:hover {
+  background: var(--ap-subtle);
+  color: var(--ap-text);
+}
+
+.ap-fp-close:focus-visible {
+  outline: 2px solid var(--ap-burgundy);
+  outline-offset: 2px;
+}
+
+.ap-fp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ap-fp-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--ap-burgundy-soft);
+  color: var(--ap-burgundy);
+}
+
+.ap-fp-icon.is-success {
+  background: var(--ap-burgundy);
+  color: #fff;
+}
+
+.ap-fp-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ap-black);
+}
+
+.ap-fp-text {
+  margin: -6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ap-muted);
+}
+
+.ap-fp-text strong {
+  font-weight: 600;
+  color: var(--ap-text);
+  word-break: break-all;
+}
+
+.ap-fp-body .ap-switch {
+  margin: 0;
+}
+
+@keyframes ap-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .ap-fp-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .ap-fp-modal {
+    max-width: none;
+    margin: 0;
+    padding: 32px 20px 24px;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+/* =========================
+   Motion + responsive
+   ========================= */
+
+@keyframes ap-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ap-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Very large screens: scale the content up a bit */
+@media (min-width: 1600px) {
+  .ap-form-wrap {
+    max-width: 440px;
+  }
+
+  .ap-hero-content {
+    max-width: 620px;
+  }
+
+  .ap-slogan-sub {
+    font-size: 19px;
+  }
+}
+
+/* Short screens (small laptops, phones in landscape): tighten vertical spacing */
+@media (max-height: 760px) {
+  .ap-form-wrap {
+    padding: 16px 0;
+  }
+
+  .ap-subtitle {
+    margin-bottom: 20px;
+  }
+
+  .ap-tabs {
+    margin-bottom: 18px;
+  }
+
+  .ap-form {
+    gap: 14px;
+  }
+
+  .ap-hero-side {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .ap-slogan-sub {
+    margin-bottom: 24px;
+  }
+}
+
+/* Tablet and below: hide the slogan panel, form takes the full width */
+@media (max-width: 960px) {
+  .ap-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ap-hero-side {
+    display: none;
+  }
+
+  .ap-form-side {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ap-form-side {
+    padding: 20px 18px 28px;
+  }
+
+  .ap-title {
+    font-size: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-field-nested,
+  .ap-fp-overlay,
+  .ap-fp-modal,
+  .ap-spinner {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

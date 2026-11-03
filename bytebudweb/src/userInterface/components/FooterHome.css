@@ -1,0 +1,135 @@
+/* ByteBud: buyer footer
+   Theme: white, black, burgundy */
+
+.bb-footer {
+  --bb-burgundy: #7a1230;
+
+  width: 100%;
+  margin-top: auto;
+  background: #0e0e10;
+  background: linear-gradient(160deg, #0b0b0d 0%, #1d0a11 100%);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.bb-footer *,
+.bb-footer *::before,
+.bb-footer *::after {
+  box-sizing: border-box;
+}
+
+.bb-footer-inner {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 56px clamp(16px, 3vw, 40px) 40px;
+}
+
+.bb-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bb-footer-logo,
+.bb-footer-logo-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+
+.bb-footer-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.bb-footer-logo-placeholder {
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bb-footer-name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.bb-footer-about p {
+  max-width: 340px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.bb-footer-col h3 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bb-footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.bb-footer-col a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.bb-footer-col a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.bb-footer a:focus-visible {
+  outline: 2px solid #e6a2b5;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.bb-footer-bottom {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 20px clamp(16px, 3vw, 40px) 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 900px) {
+  .bb-footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding-top: 44px;
+  }
+
+  .bb-footer-about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .bb-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
