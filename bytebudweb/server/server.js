@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { Course, LaptopModel, Unit, User, School, StudentVerification } from "./models.js";
 
-dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
+dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)), override: true });
 
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
@@ -70,7 +70,9 @@ const requireAuth = async (req, res, next) => {
 
 /* ---------- routes ---------- */
 
-app.get("/api/health", (_req, res) => res.json({ ok: true }));
+app.get("/api/health", (_req, res) =>
+  res.json({ ok: true, database: mongoose.connection.name })
+);
 
 // Public storefront view assembled from courses, units, and laptop_models.
 app.get("/api/catalog/home", async (_req, res) => {

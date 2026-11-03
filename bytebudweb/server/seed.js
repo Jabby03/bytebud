@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { demoCourses, demoUnits } from "../Homedemodata.js";
 import { Acquisition, Course, LaptopModel, School, Supplier, Unit, User } from "./models.js";
 
-dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
+dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)), override: true });
 
 const SCHOOLS = [
   { schoolName: "University of Science and Technology of Southern Philippines", emailDomains: ["ustp.edu.ph"] },
@@ -44,7 +44,7 @@ try {
       passwordHash: await bcrypt.hash(ADMIN.password, 10),
       role: "admin",
     });
-    console.log(`Admin created: ${ADMIN.email} / ${ADMIN.password}`);
+    console.log(`Demo admin account created: ${ADMIN.email}`);
   } else {
     console.log(`Admin already exists: ${ADMIN.email}`);
   }
@@ -141,6 +141,8 @@ try {
   console.log(`Partner schools ready: ${SCHOOLS.length}`);
   console.log(`Courses ready: ${courses.length}`);
   console.log(`Demo laptop units ready: ${demoUnits.length}`);
+  console.log(`Users in ${mongoose.connection.name}: ${await User.countDocuments()}`);
+  console.log(`Seed admin present: ${Boolean(await User.exists({ email: ADMIN.email }))}`);
   console.log("Demo inventory has zeroed acquisition costs and should not be treated as real financial data.");
 } finally {
   await mongoose.disconnect();
