@@ -5,7 +5,7 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { User, School, StudentVerification } from "./models.js";
+import { Course, LaptopModel, Unit, User, School, StudentVerification } from "./models.js";
 
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)) });
 
@@ -23,6 +23,7 @@ const signToken = (user) =>
 const publicUser = (user) => ({
   userId: user._id,
   fullName: user.fullName,
+  phone: user.phone,
   email: user.email,
   role: user.role,
 });
@@ -71,11 +72,47 @@ const requireAuth = async (req, res, next) => {
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
+// Public storefront view assembled from courses, units, and laptop_models.
+app.get("/api/catalog/home", async (_req, res) => {
+  try {
+    const [courses, units] = await Promise.all([
+      Course.find().sort({ courseCode: 1 }).lean(),
+      Unit.find({
+        unitStatus: { $in: ["available", "reserved"] },
+        "listing.price": { $type: "number" },
+      })
+        .populate("modelId", "brand modelName specs")
+        .sort({ "listing.listedAt": -1 })
+        .lean(),
+    ]);
+
+    res.json({
+      courses: courses.map(({ _id, ...course }) => ({ courseId: String(_id), ...course })),
+      units: units
+        .filter((unit) => unit.modelId)
+        .map(({ _id, modelId, ...unit }) => ({
+          unitId: String(_id),
+          ...unit,
+          modelId: String(modelId._id),
+          model: {
+            modelId: String(modelId._id),
+            brand: modelId.brand,
+            modelName: modelId.modelName,
+            specs: modelId.specs,
+          },
+        })),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Could not load the laptop catalog." });
+  }
+});
+
 // Register: always creates a buyer. Student sign-ups also create a pending verification.
 app.post("/api/auth/register", async (req, res) => {
   let createdUser = null;
   try {
-    const { fullName, email, password, isStudent, schoolEmail } = req.body || {};
+    const { fullName, phone, email, password, isStudent, schoolEmail } = req.body || {};
 
     if (!fullName?.trim()) return res.status(400).json({ message: "Enter your full name." });
     if (!EMAIL_RE.test(email || "")) return res.status(400).json({ message: "Enter a valid email address." });
@@ -100,12 +137,17 @@ app.post("/api/auth/register", async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    createdUser = await User.create({ fullName: fullName.trim(), email: cleanEmail, passwordHash, role: "buyer" });
+    createdUser = await User.create({
+      fullName: fullName.trim(),
+      phone: typeof phone === "string" ? phone.trim() : "",
+      email: cleanEmail,
+      passwordHash,
+      role: "buyer",
+    });
 
     if (school) {
       await StudentVerification.create({
         userId: createdUser._id,
-        schoolId: school._id,
         schoolEmail: cleanSchoolEmail,
         verifStatus: "pending",
       });

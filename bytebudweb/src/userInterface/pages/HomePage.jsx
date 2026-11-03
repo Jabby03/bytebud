@@ -19,7 +19,8 @@ import "./HomePage.css";
  *   onOpenUnit={(unitId) => navigate(`/laptops/${unitId}`)}   // optional; otherwise plain links are used
  * />
  *
- * Remove the demo defaults (homeDemoData.js) once the page is connected to the API.
+ * App supplies catalog records from the API in normal use. The defaults are
+ * retained for isolated page previews; Homedemodata.js also feeds the demo seed.
  *
  * Unit shape expected:
  *   { unitId, conditionGrade, estimatedBatteryHrs, unitStatus,

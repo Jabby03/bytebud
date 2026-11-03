@@ -9,7 +9,7 @@ import "./AuthPage.css";
  *     initialMode="login"             // "login" | "register"
  *     logoSrc="/logo.svg"             // optional: leave out to show the placeholder
  *     onLogin={async ({ email, password }) => { ... }}
- *     onRegister={async ({ fullName, email, password, isStudent, schoolEmail }) => { ... }}
+ *     onRegister={async ({ fullName, phone, email, password, isStudent, schoolEmail }) => { ... }}
  *     showForgotPassword={false}      // forgot password is postponed: hidden by default
  *     onForgotPassword={async ({ email }) => { ... }}
  *     onSuccess={() => navigate("/")} // runs after a successful login/register
@@ -19,8 +19,8 @@ import "./AuthPage.css";
  *  - Send the plain password over HTTPS only; hash it server-side into Users.passwordHash.
  *  - Register always creates Users.role = "buyer" (never trust a role from the client).
  *  - After login, route by Users.role: buyer -> storefront, staff/admin -> /admin.
- *  - If isStudent is true: match schoolEmail's domain against Schools.emailDomains,
- *    then create Student_Verifications { userId, schoolId, verifStatus: "pending" }.
+ *  - If isStudent is true: match schoolEmail's domain against the partner-school
+ *    lookup, then create Student_Verifications { userId, schoolEmail, verifStatus: "pending" }.
  *  - onForgotPassword: email a time-limited reset link to the address if an account exists.
  *    Return the same result either way so the form never reveals which emails are registered.
  *  - Throw an Error with a readable message from onLogin/onRegister to show it in the form
@@ -31,6 +31,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const EMPTY_FORM = {
   fullName: "",
+  phone: "",
   email: "",
   password: "",
   isStudent: false,
@@ -303,6 +304,7 @@ export default function AuthPage({
       if (isRegister) {
         await onRegister({
           fullName: form.fullName.trim(),
+          phone: form.phone.trim(),
           email: form.email.trim().toLowerCase(),
           password: form.password,
           isStudent: form.isStudent,
@@ -367,24 +369,40 @@ export default function AuthPage({
             )}
 
             {isRegister && (
-              <div className="ap-field">
-                <label htmlFor="ap-fullname">Full name</label>
-                <input
-                  id="ap-fullname"
-                  ref={firstFieldRef}
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Juan Dela Cruz"
-                  value={form.fullName}
-                  onChange={(e) => setField("fullName", e.target.value)}
-                  aria-invalid={!!errors.fullName}
-                  aria-describedby={errors.fullName ? "ap-fullname-error" : undefined}
-                />
-                {errors.fullName && (
-                  <p className="ap-error" id="ap-fullname-error">
-                    {errors.fullName}
-                  </p>
-                )}
+              <div className="ap-name-phone-row">
+                <div className="ap-field">
+                  <label htmlFor="ap-fullname">Full name</label>
+                  <input
+                    id="ap-fullname"
+                    ref={firstFieldRef}
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Juan Dela Cruz"
+                    value={form.fullName}
+                    onChange={(e) => setField("fullName", e.target.value)}
+                    aria-invalid={!!errors.fullName}
+                    aria-describedby={errors.fullName ? "ap-fullname-error" : undefined}
+                  />
+                  {errors.fullName && (
+                    <p className="ap-error" id="ap-fullname-error">
+                      {errors.fullName}
+                    </p>
+                  )}
+                </div>
+
+                <div className="ap-field">
+                  <label htmlFor="ap-phone">Phone number <span className="ap-optional">(optional)</span></label>
+                  <input
+                    id="ap-phone"
+                    type="tel"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="+63 912 345 6789"
+                    maxLength={32}
+                    value={form.phone}
+                    onChange={(e) => setField("phone", e.target.value)}
+                  />
+                </div>
               </div>
             )}
 

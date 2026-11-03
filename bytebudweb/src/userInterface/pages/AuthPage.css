@@ -170,6 +170,18 @@ body,
   gap: 7px;
 }
 
+.ap-name-phone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.ap-optional {
+  color: #8b8791;
+  font-size: 12px;
+  font-weight: 400;
+}
+
 .ap-field label {
   font-size: 13px;
   font-weight: 600;
@@ -177,6 +189,7 @@ body,
 }
 
 .ap-field input[type="text"],
+.ap-field input[type="tel"],
 .ap-field input[type="email"],
 .ap-field input[type="password"] {
   width: 100%;
@@ -712,6 +725,10 @@ body,
 
   .ap-title {
     font-size: 28px;
+  }
+
+  .ap-name-phone-row {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

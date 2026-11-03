@@ -1,14 +1,12 @@
 /**
- * Demo data for the Home page. Shapes follow the data model:
- *  - Courses            { courseId, courseCode, courseName, requirements{...} }
- *  - Units (joined)     { unitId, modelId, conditionGrade, estimatedBatteryHrs, unitStatus, reserveUntil,
- *                         actualSpecs{...}, listing{ price, studentPrice, listedAt, photos[], warrantyMonths [NEW] },
- *                         model: Laptop_Models { brand, modelName, specs{...} } }
- *  - Student_Verifications { verifStatus, expiresAt }
- *  - Users              { fullName, role }
+ * Demo view data for HomePage, projected from the ERD's courses, units,
+ * laptop_models, student_verifications, and users collections. The *Id
+ * properties are API-facing names for each MongoDB document's _id. Units
+ * include a populated model and only listing fields needed by the storefront.
  *
- * Delete this file once the page is connected to the API.
- * Leave photoUrl empty to see the photo placeholder.
+ * The backend seed maps these storefront examples into ERD-shaped course,
+ * laptop_model, acquisition, and unit documents. Leave photoUrl empty to see
+ * the photo placeholder.
  */
 
 export const demoUser = { fullName: "Juan Dela Cruz", role: "buyer" };
