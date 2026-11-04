@@ -1,0 +1,128 @@
+/* ByteBud buyer: A3 Cart & Checkout
+   Theme: white, black, burgundy (tokens and shared classes come from BuyerShared.css).
+   Also reuses .ld-crumbs, .ld-h2, .ld-muted and .ld-student-hint from LaptopDetailPage.css,
+   so keep that stylesheet imported on this route. */
+
+.cc-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr); gap: clamp(24px, 3.5vw, 48px); align-items: start; }
+.cc-main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+
+.cc-card { min-width: 0; padding: 24px; border: 1px solid var(--by-border); border-radius: 18px; background: var(--by-surface); }
+.cc-card .ld-h2 { margin-bottom: 14px; }
+.cc-lead { margin: -6px 0 16px; }
+
+/* ---------- Items ---------- */
+.cc-items { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.cc-item { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 18px; align-items: start; padding: 18px 0; border-top: 1px solid var(--by-border); }
+.cc-item:first-child { padding-top: 4px; border-top: 0; }
+.cc-item:last-child { padding-bottom: 0; }
+.cc-item.is-unavailable .cc-thumb { opacity: 0.55; }
+.cc-item.is-unavailable .cc-item-price { opacity: 0.6; }
+
+.cc-thumb { width: 112px; aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--by-border); border-radius: 12px; background: var(--by-subtle); }
+.cc-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.cc-photo-empty { display: grid; place-items: center; width: 100%; height: 100%; color: #b9b4ba; }
+
+.cc-item-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cc-item-brand { margin: 0; font-size: 13px; font-weight: 600; color: var(--by-muted); }
+.cc-item-title { font-size: 17px; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; color: var(--by-black); text-decoration: none; }
+a.cc-item-title:hover { color: var(--by-burgundy); text-decoration: underline; }
+a.cc-item-title:focus-visible { outline: 2px solid var(--by-burgundy); outline-offset: 2px; border-radius: 4px; }
+.cc-item-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 2px; font-size: 13.5px; color: var(--by-muted); }
+
+.cc-hold { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; font-size: 13.5px; color: var(--by-amber); }
+.cc-hold svg { flex: 0 0 auto; }
+.cc-hold strong { font-variant-numeric: tabular-nums; }
+.cc-hold.is-low { color: var(--by-danger); }
+.cc-state { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; }
+.cc-state.is-bad { color: var(--by-danger); }
+
+.cc-item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cc-item-price { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.cc-item-price strong { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; color: var(--by-black); }
+.cc-item-price strong.is-student { color: var(--by-burgundy); }
+.cc-item-price span { font-size: 13.5px; color: var(--by-muted); text-decoration: line-through; }
+.cc-remove:hover { background: var(--by-danger-soft); color: var(--by-danger); }
+.cc-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Pickup + payment ---------- */
+.cc-date { max-width: 320px; }
+
+.cc-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.cc-method {
+  display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 12px 16px;
+  border: 1px solid var(--by-border); border-radius: 12px; background: var(--by-surface);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.cc-method:hover { border-color: #c9c5ca; }
+.cc-method input { width: 18px; height: 18px; margin: 0; accent-color: var(--by-burgundy); cursor: pointer; }
+.cc-method.is-selected { border-color: var(--by-burgundy); background: var(--by-burgundy-soft); box-shadow: 0 0 0 1px var(--by-burgundy); }
+.cc-method:focus-within { outline: 2px solid var(--by-burgundy); outline-offset: 2px; }
+.cc-methods[aria-invalid="true"] .cc-method:not(.is-selected) { border-color: var(--by-danger); }
+.cc-method-error { margin-top: 10px; }
+
+/* ---------- Summary ---------- */
+.cc-summary { position: sticky; top: 88px; min-width: 0; padding: 26px; border: 1px solid var(--by-border); border-radius: 18px; background: var(--by-surface); box-shadow: 0 10px 30px rgba(14, 14, 16, 0.06); }
+.cc-totals { display: grid; gap: 12px; margin: 0 0 18px; }
+.cc-totals div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; font-size: 15px; }
+.cc-totals dt { color: var(--by-muted); }
+.cc-totals dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cc-totals .is-green dt, .cc-totals .is-green dd { color: var(--by-green); }
+.cc-totals .is-total { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--by-border); }
+.cc-totals .is-total dt { font-size: 16px; font-weight: 700; color: var(--by-black); }
+.cc-totals .is-total dd { font-size: clamp(24px, 2.6vw, 30px); font-weight: 800; letter-spacing: -0.03em; color: var(--by-black); }
+
+.cc-summary .ld-student-hint { margin: 0 0 16px; }
+.cc-small { margin: 0 0 16px; font-size: 13px; line-height: 1.55; color: var(--by-muted); }
+.cc-place { height: 52px; font-size: 16px; }
+.cc-assure { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 0; font-size: 13px; line-height: 1.55; color: var(--by-muted); }
+.cc-assure svg { flex: 0 0 auto; margin-top: 1px; color: var(--by-burgundy); }
+
+/* ---------- Success ---------- */
+.cc-success { display: flex; flex-direction: column; align-items: center; max-width: 560px; margin: 0 auto; padding: clamp(8px, 3vw, 32px) 0 0; text-align: center; }
+.cc-success-icon { display: grid; place-items: center; width: 68px; height: 68px; margin-bottom: 18px; border-radius: 50%; background: var(--by-green-soft); color: var(--by-green); }
+.cc-success .by-subheading { margin-bottom: 24px; }
+.cc-success-card { width: 100%; margin: 0 0 18px; padding: 8px 22px; border: 1px solid var(--by-border); border-radius: 16px; background: var(--by-surface); text-align: left; }
+.cc-success-card div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--by-border); font-size: 15px; }
+.cc-success-card div:last-child { border-bottom: 0; }
+.cc-success-card dt { color: var(--by-muted); }
+.cc-success-card dd { margin: 0; font-weight: 700; text-align: right; }
+.cc-success-card .cc-order-no { font-size: 18px; font-weight: 800; letter-spacing: 0.02em; color: var(--by-burgundy); }
+.cc-success-card .is-green { color: var(--by-green); }
+.cc-success-card .is-total dd { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+.cc-success-note { width: 100%; margin-bottom: 22px; text-align: left; }
+.cc-success-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+/* ---------- Mobile bar ---------- */
+.cc-mobilebar { display: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .cc-layout { grid-template-columns: minmax(0, 1fr); }
+  .cc-summary { position: static; padding: 22px; }
+  .cc-summary .cc-place { display: none; }
+
+  .cc-mobilebar {
+    position: fixed; right: 0; bottom: 0; left: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px var(--by-pad) calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--by-border); background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(10px);
+    box-shadow: 0 -8px 24px rgba(14, 14, 16, 0.08);
+  }
+  .cc-mobilebar strong { display: block; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .cc-mobilebar small { display: block; font-size: 12px; font-weight: 600; color: var(--by-burgundy); }
+  .cc-mobile-action { flex: 0 1 260px; }
+  .cc-mobile-action .by-btn { height: 48px; padding: 0 16px; font-size: 15px; }
+  .by-page .by-main { padding-bottom: 96px; }
+}
+
+@media (max-width: 560px) {
+  .cc-card { padding: 18px 16px; }
+  .cc-item { grid-template-columns: 84px minmax(0, 1fr); gap: 12px 14px; }
+  .cc-thumb { width: 84px; }
+  .cc-item-side { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+  .cc-item-price { align-items: flex-start; }
+  .cc-date { max-width: none; }
+  .cc-methods { grid-template-columns: minmax(0, 1fr); }
+  .cc-success-card { padding: 4px 16px; }
+}

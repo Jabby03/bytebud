@@ -344,8 +344,8 @@ function UnitDrawer({ unit, isNew, units, models, acquisitions, users, admin, is
     };
     // Flow rule: a passed inspection makes the unit ready to list; a failed one sends it to repair.
     let status = saved.unitStatus;
-    if (entry.passed && ["awaiting_inspection", "in_repair"].includes(status)) status = "ready_to_list";
-    else if (!entry.passed && ["awaiting_inspection", "ready_to_list"].includes(status)) status = "in_repair";
+    if (entry.passed && ["awaiting_inspection", "in_repair"].includes(status)) status = "ready";
+    else if (!entry.passed && ["awaiting_inspection", "ready", "ready_to_list"].includes(status)) status = "in_repair";
 
     const ok = await commitPartial(
       { inspections: [entry, ...saved.inspections], unitStatus: status },
@@ -386,7 +386,7 @@ function UnitDrawer({ unit, isNew, units, models, acquisitions, users, admin, is
     photo: draft.listing.photos.length > 0,
   };
   const isPublished = saved.unitStatus === "available";
-  const canPublish = saved.unitStatus === "ready_to_list" && checks.inspection && checks.price && checks.photo;
+  const canPublish = ["ready", "ready_to_list"].includes(saved.unitStatus) && checks.inspection && checks.price && checks.photo;
 
   const publish = async () => {
     const found = validateListing(draft.listing);
@@ -397,7 +397,7 @@ function UnitDrawer({ unit, isNew, units, models, acquisitions, users, admin, is
       "Published to the store."
     );
   };
-  const unpublish = () => commitPartial({ unitStatus: "ready_to_list" }, "Removed from the store.");
+  const unpublish = () => commitPartial({ unitStatus: "ready" }, "Removed from the store.");
 
   /* ----- Render ----- */
   const repairTotal = sumRepairs(saved);
@@ -781,7 +781,7 @@ function UnitDrawer({ unit, isNew, units, models, acquisitions, users, admin, is
                 </>
               ) : (
                 <p className="ad-note is-warn">
-                  {saved.unitStatus === "ready_to_list"
+                  {["ready", "ready_to_list"].includes(saved.unitStatus)
                     ? "Complete the checklist above, then publish."
                     : saved.unitStatus === "reserved" || saved.unitStatus === "sold"
                       ? "This unit is reserved or sold, so it cannot be published or unpublished."

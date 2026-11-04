@@ -14,7 +14,7 @@ import "./AdminShared.css";
 export const UNIT_STATUSES = [
   { value: "awaiting_inspection", label: "Awaiting inspection", tone: "amber" },
   { value: "in_repair", label: "In repair", tone: "red" },
-  { value: "ready_to_list", label: "Ready to list", tone: "grey" },
+  { value: "ready", label: "Ready", tone: "grey" },
   { value: "available", label: "Available", tone: "green" },
   { value: "reserved", label: "Reserved", tone: "burgundy" },
   { value: "sold", label: "Sold", tone: "dark" },

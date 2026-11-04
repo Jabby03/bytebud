@@ -113,7 +113,7 @@ export default function AdminDashboard({
     const stock = STOCK_STATUSES.map((st) => ({ ...st, count: units.filter((u) => u.unitStatus === st.value).length }));
     const stockTotal = stock.reduce((sum, s2) => sum + s2.count, 0);
 
-    /* Cost vs. sales, last 6 months: net sales (priceAtSale - discountAmount) vs unit cost (costBasis + repairs) */
+    /* Cost vs. sales, last 6 months: Orders.orderItems.priceAtSale vs unit cost */
     const months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(y, m - (5 - i), 1);
       return { y: d.getFullYear(), m: d.getMonth(), label: d.toLocaleString("en", { month: "short" }), sales: 0, cost: 0 };
@@ -122,7 +122,7 @@ export default function AdminDashboard({
       const bucket = months.find((b) => sameMonth(o.orderCreatedAt, b.y, b.m));
       if (!bucket) continue;
       for (const item of o.orderItems || []) {
-        bucket.sales += (item.priceAtSale || 0) - (item.discountAmount || 0);
+        bucket.sales += item.priceAtSale || 0;
         const u = unitById.get(item.unitId);
         if (u) bucket.cost += unitCost(u);
       }

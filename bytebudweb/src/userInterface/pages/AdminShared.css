@@ -164,6 +164,13 @@
 .ad-panel .ad-form-grid input { min-height: 40px; padding: 9px 11px; border: 1px solid var(--ad-border); border-radius: 9px; font: inherit; }
 .ad-panel select { max-width: 220px; min-height: 34px; padding: 6px 8px; border: 1px solid var(--ad-border); border-radius: 8px; background: #fff; font: inherit; }
 .ad-panel .ad-table td .ad-btn { white-space: nowrap; }
+.ad-audit-filters { margin: 12px 0; }
+.ad-audit-filters label { display: flex; align-items: center; gap: 6px; color: var(--ad-muted); font-size: 13px; }
+.ad-catalog-form { min-width: min(720px, 90vw); }
+.ad-catalog-form summary { display: inline-flex; align-items: center; cursor: pointer; list-style: none; }
+.ad-catalog-form[open] { padding: 12px; border: 1px solid var(--ad-border); border-radius: 10px; background: var(--ad-surface); }
+.ad-catalog-form .ad-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ad-json { max-width: 100%; overflow: auto; padding: 12px; border-radius: 8px; background: #f5f3f4; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .ad-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--ad-border); overflow-x: auto; }
 .ad-tab {
   position: relative;

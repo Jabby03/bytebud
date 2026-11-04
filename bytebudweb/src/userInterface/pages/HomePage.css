@@ -261,6 +261,7 @@ body,
 .hp-filter-btn:focus-visible,
 .hp-page-btn:focus-visible,
 .hp-reco-submit:focus-visible,
+.hp-reco-clear:focus-visible,
 .hp-empty-btn:focus-visible,
 .hp-link:focus-visible,
 .hp-drawer-close:focus-visible,
@@ -295,6 +296,17 @@ body,
 .hp-reco-submit:active {
   transform: translateY(1px);
 }
+
+.hp-reco-actions { display: flex; gap: 8px; min-width: 0; }
+.hp-reco-actions .hp-reco-submit { flex: 1; padding-right: 18px; padding-left: 18px; }
+.hp-reco-clear {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 18px;
+  border: 1px solid var(--hp-border); border-radius: 10px; background: #fff; color: var(--hp-text);
+  font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+.hp-reco-clear:hover { border-color: var(--hp-burgundy); background: var(--hp-burgundy-soft); color: var(--hp-burgundy); }
+.hp-reco-clear:active { transform: translateY(1px); }
 
 /* =========================
    Results layout
@@ -1046,7 +1058,7 @@ body,
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .hp-reco-submit {
+  .hp-reco-actions {
     grid-column: 1 / -1;
   }
 }

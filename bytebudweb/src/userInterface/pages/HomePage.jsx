@@ -70,7 +70,7 @@ const isStudentVerified = (verification) =>
 
 const getPrice = (unit, verified) => {
   const listing = unit.listing || {};
-  return verified && listing.studentPrice != null ? listing.studentPrice : listing.price;
+  return verified && listing.studentPrice != null ? Math.min(listing.price ?? listing.studentPrice, listing.studentPrice) : listing.price;
 };
 
 const getPhoto = (unit) => {
@@ -429,6 +429,7 @@ export default function HomePage({
   error = "",
   onLogout,
   onOpenUnit,
+  onNavigate,
 }) {
   const [draft, setDraft] = useState(EMPTY_RECO); // recommendation bar (not applied until "Show matches")
   const [applied, setApplied] = useState(EMPTY_RECO);
@@ -581,7 +582,7 @@ export default function HomePage({
 
   return (
     <div className="hp-page">
-      <Navbar user={user} cartCount={cartCount} logoSrc={logoSrc} onLogout={onLogout} />
+      <Navbar user={user} cartCount={cartCount} logoSrc={logoSrc} onLogout={onLogout} onNavigate={onNavigate} />
 
       <main className="hp-main">
         {/* ---------- Hero ---------- */}
@@ -650,9 +651,14 @@ export default function HomePage({
               </div>
             </div>
 
-            <button type="submit" className="hp-reco-submit">
-              Show matches
-            </button>
+            <div className="hp-reco-actions">
+              <button type="submit" className="hp-reco-submit">
+                Show matches
+              </button>
+              <button type="button" className="hp-reco-clear" onClick={resetAll}>
+                Clear
+              </button>
+            </div>
           </form>
         </section>
 

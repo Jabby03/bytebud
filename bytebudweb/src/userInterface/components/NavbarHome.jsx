@@ -47,6 +47,8 @@ export default function Navbar({
   accountHref = "/account",
   adminHref = "/admin",
   onLogout,
+  onNavigate,
+  activePage = "home",
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -54,6 +56,10 @@ export default function Navbar({
   const name = user?.fullName?.trim() || "Account";
   const initial = name.charAt(0).toUpperCase();
   const isStaff = user?.role === "admin" || user?.role === "staff";
+  const handleNavigate = (event, href) => {
+    setMenuOpen(false);
+    if (onNavigate) { event.preventDefault(); onNavigate(href); }
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -74,7 +80,7 @@ export default function Navbar({
   return (
     <header className="bb-nav">
       <div className="bb-nav-inner">
-        <a className="bb-nav-brand" href={homeHref} aria-label="ByteBud home">
+        <a className="bb-nav-brand" href={homeHref} aria-label="ByteBud home" onClick={(e) => handleNavigate(e, homeHref)}>
           {logoSrc ? (
             <img className="bb-nav-logo" src={logoSrc} alt="" />
           ) : (
@@ -87,13 +93,13 @@ export default function Navbar({
         </a>
 
         <nav className="bb-nav-links" aria-label="Main">
-          <a className="bb-nav-link is-active" href={homeHref} aria-current="page">
+          <a className={`bb-nav-link ${activePage === "home" ? "is-active" : ""}`} href={homeHref} aria-current={activePage === "home" ? "page" : undefined} onClick={(e) => handleNavigate(e, homeHref)}>
             Find a Laptop
           </a>
         </nav>
 
         <div className="bb-nav-actions">
-          <a className="bb-nav-cart" href={cartHref} aria-label={`Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}>
+          <a className="bb-nav-cart" href={cartHref} onClick={(e) => handleNavigate(e, cartHref)} aria-label={`Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}>
             <CartIcon />
             {cartCount > 0 && <span className="bb-nav-badge">{cartCount > 99 ? "99+" : cartCount}</span>}
           </a>
@@ -116,15 +122,15 @@ export default function Navbar({
             {menuOpen && (
               <div className="bb-nav-menu" role="menu">
                 <div className="bb-nav-menu-head">{name}</div>
-                <a className="bb-nav-menu-item bb-nav-menu-mobile" role="menuitem" href={homeHref}>
+                <a className="bb-nav-menu-item bb-nav-menu-mobile" role="menuitem" href={homeHref} onClick={(e) => handleNavigate(e, homeHref)}>
                   Find a Laptop
                 </a>
-                <a className="bb-nav-menu-item" role="menuitem" href={accountHref}>
+                <a className="bb-nav-menu-item" role="menuitem" href={accountHref} onClick={(e) => handleNavigate(e, accountHref)}>
                   My account
                 </a>
                 {isStaff && (
-                  <a className="bb-nav-menu-item" role="menuitem" href={adminHref}>
-                    Admin panel
+                  <a className="bb-nav-menu-item" role="menuitem" href={adminHref} onClick={(e) => handleNavigate(e, adminHref)}>
+                    Dashboard
                   </a>
                 )}
                 <button
