@@ -41,3 +41,4 @@ export async function login(credentials) {
 
 export const fetchMe = () => request("/api/auth/me");
 export const fetchHomeCatalog = () => request("/api/catalog/home");
+export const adminRequest = (path, options) => request(`/api/admin${path}`, options);

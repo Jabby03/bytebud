@@ -1,0 +1,163 @@
+/* ByteBud admin shell
+   Theme: white, black, burgundy. Tokens (--ad-*) used by all admin components are defined here. */
+
+/* Let the page fill the whole browser window (overrides the default Vite starter styles). */
+html, body, #root {
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: block;
+  text-align: left;
+  background: #f5f4f5;
+}
+
+.al-shell {
+  --ad-burgundy: #7a1230;
+  --ad-burgundy-dark: #5c0d24;
+  --ad-burgundy-soft: #f8eef1;
+  --ad-black: #0e0e10;
+  --ad-text: #131316;
+  --ad-muted: #6b6b76;
+  --ad-border: #e3e1e4;
+  --ad-surface: #ffffff;
+  --ad-subtle: #f5f4f5;
+  --ad-danger: #b3261e;
+  --ad-danger-soft: #fdeceb;
+  --ad-sidebar: 256px;
+
+  display: grid;
+  grid-template-columns: var(--ad-sidebar) minmax(0, 1fr);
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--ad-subtle);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ad-text);
+  text-align: left;
+}
+.al-shell *, .al-shell *::before, .al-shell *::after { box-sizing: border-box; }
+
+/* ---------- Sidebar ---------- */
+.al-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100vh;
+  height: 100dvh;
+  padding: 20px 14px;
+  background: linear-gradient(180deg, #0b0b0d 0%, #1a0910 70%, #2b0a15 100%);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.al-brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 20px; color: #fff; text-decoration: none; }
+.al-logo, .al-logo-placeholder { width: 38px; height: 38px; border-radius: 9px; flex: 0 0 38px; }
+.al-logo { object-fit: contain; }
+.al-logo-placeholder {
+  display: grid; place-items: center;
+  border: 1.5px dashed rgba(255, 255, 255, 0.35);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.6);
+}
+.al-brand-text { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.al-brand-text small { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; color: #e6a2b5; }
+
+.al-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
+.al-nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 14.5px; font-weight: 600;
+  color: inherit; text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.al-nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.al-nav-item.is-active { background: var(--ad-burgundy); color: #fff; }
+.al-nav-badge {
+  margin-left: auto; min-width: 22px; padding: 1px 7px;
+  border-radius: 11px; background: #fff; font-size: 12px; font-weight: 700; text-align: center; color: var(--ad-burgundy);
+}
+.al-store-link {
+  padding: 11px 12px; border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.7); text-decoration: none;
+}
+.al-store-link:hover { color: #fff; }
+.al-sidebar a:focus-visible, .al-sidebar button:focus-visible { outline: 2px solid #e6a2b5; outline-offset: 2px; }
+
+/* ---------- Main + top bar ---------- */
+.al-main { min-width: 0; display: flex; flex-direction: column; }
+
+.al-topbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 16px;
+  height: 68px; padding: 0 clamp(16px, 2.5vw, 36px);
+  border-bottom: 1px solid var(--ad-border);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(1.4) blur(10px);
+}
+.al-hamburger { display: none; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; color: var(--ad-text); cursor: pointer; }
+.al-hamburger:hover { background: var(--ad-subtle); }
+
+.al-search {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; max-width: 520px; height: 42px; padding: 0 14px;
+  border: 1px solid var(--ad-border); border-radius: 999px; background: var(--ad-subtle);
+  color: var(--ad-muted);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.al-search:focus-within { border-color: var(--ad-burgundy); background: #fff; box-shadow: 0 0 0 3px rgba(122, 18, 48, 0.14); }
+.al-search input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: inherit; font-size: 14px; color: var(--ad-text); }
+.al-search input::placeholder { color: #9a96a0; }
+
+.al-profile { position: relative; margin-left: auto; }
+.al-profile-btn {
+  display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 4px;
+  border: 1px solid var(--ad-border); border-radius: 999px; background: #fff;
+  font: inherit; text-align: left; cursor: pointer;
+}
+.al-profile-btn:hover { background: var(--ad-subtle); }
+.al-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ad-burgundy); font-size: 14px; font-weight: 700; color: #fff; }
+.al-profile-text { display: flex; flex-direction: column; line-height: 1.2; }
+.al-profile-text strong { max-width: 150px; overflow: hidden; font-size: 13.5px; text-overflow: ellipsis; white-space: nowrap; }
+.al-profile-text small { font-size: 12px; color: var(--ad-muted); }
+.al-profile-btn:focus-visible, .al-hamburger:focus-visible { outline: 2px solid var(--ad-burgundy); outline-offset: 2px; }
+
+.al-menu {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
+  display: flex; flex-direction: column; min-width: 180px; padding: 6px;
+  border: 1px solid var(--ad-border); border-radius: 12px; background: #fff;
+  box-shadow: 0 16px 40px rgba(14, 14, 16, 0.16);
+}
+.al-menu a, .al-menu button {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: none;
+  font: inherit; font-size: 14px; text-align: left; color: var(--ad-text); text-decoration: none; cursor: pointer;
+}
+.al-menu a:hover, .al-menu button:hover { background: var(--ad-subtle); }
+.al-menu .is-danger { color: var(--ad-danger); }
+
+.al-content { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: clamp(18px, 2.5vw, 36px); }
+
+.al-scrim { position: fixed; inset: 0; z-index: 90; background: rgba(14, 14, 16, 0.5); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .al-shell { grid-template-columns: minmax(0, 1fr); }
+  .al-sidebar {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
+    width: min(280px, 85vw);
+    transform: translateX(-100%);
+    transition: transform 0.22s ease-out;
+  }
+  .al-sidebar.is-open { transform: translateX(0); }
+  .al-hamburger { display: grid; }
+}
+
+@media (max-width: 560px) {
+  .al-topbar { gap: 10px; height: 60px; }
+  .al-profile-text { display: none; }
+  .al-profile-btn { padding: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .al-sidebar { transition: none; } }
