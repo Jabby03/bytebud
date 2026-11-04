@@ -379,7 +379,7 @@ export default function AuthPage({
                 </div>
 
                 <div className="ap-field">
-                  <label htmlFor="ap-phone">Phone number <span className="ap-optional">(optional)</span></label>
+                  <label htmlFor="ap-phone">Phone number</label>
                   <input
                     id="ap-phone"
                     type="tel"
