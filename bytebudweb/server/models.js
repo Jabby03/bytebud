@@ -313,18 +313,6 @@ const auditLogSchema = new Schema(
   { collection: "audit_logs", ...timestamps("logCreatedAt", false) }
 );
 
-/* ---------- SCHOOLS (backend helper, not shown in the supplied ERD) ---------- */
-// Registration uses this lookup to match school email domains. Keep it until
-// the project decides how partner schools should be represented in the ERD.
-const schoolSchema = new Schema(
-  {
-    schoolName: { type: String, required: true, trim: true },
-    emailDomains: { type: [String], default: [] },
-    status: { type: String, enum: ["active", "inactive"], default: "active" },
-  },
-  { collection: "schools", ...timestamps("schoolCreatedAt", "schoolUpdatedAt") }
-);
-
 export const User = mongoose.model("User", userSchema);
 export const StudentVerification = mongoose.model("StudentVerification", studentVerificationSchema);
 export const PasswordReset = mongoose.model("PasswordReset", passwordResetSchema);
@@ -337,4 +325,3 @@ export const Cart = mongoose.model("Cart", cartSchema);
 export const Order = mongoose.model("Order", orderSchema);
 export const Warranty = mongoose.model("Warranty", warrantySchema);
 export const AuditLog = mongoose.model("AuditLog", auditLogSchema);
-export const School = mongoose.model("School", schoolSchema);

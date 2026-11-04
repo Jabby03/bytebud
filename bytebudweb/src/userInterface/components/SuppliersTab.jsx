@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Field, Modal, Pagination, PlusIcon, SUPPLIER_TYPES, formatDate, labelOf } from "./AdminShared";
+import { Field, Modal, Pagination, PlusIcon, SUPPLIER_TYPES, formatDate, labelOf } from "../pages/AdminShared.jsx";
 
 /**
  * B2 > Suppliers tab: table + add/edit modal.

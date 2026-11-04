@@ -3,15 +3,9 @@ import { fileURLToPath } from "node:url";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { demoCourses, demoUnits } from "../Homedemodata.js";
-import { Acquisition, Course, LaptopModel, School, Supplier, Unit, User } from "./models.js";
+import { Acquisition, Course, LaptopModel, Supplier, Unit, User } from "./models.js";
 
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)), override: true });
-
-const SCHOOLS = [
-  { schoolName: "University of Science and Technology of Southern Philippines", emailDomains: ["ustp.edu.ph"] },
-  { schoolName: "Xavier University - Ateneo de Cagayan", emailDomains: ["xu.edu.ph"] },
-  { schoolName: "Liceo de Cagayan University", emailDomains: ["liceo.edu.ph"] },
-];
 
 const ADMIN = {
   fullName: "ByteBud Admin",
@@ -27,14 +21,6 @@ await mongoose.connect(process.env.MONGODB_URI);
 console.log("Connected to MongoDB:", mongoose.connection.name);
 
 try {
-  for (const school of SCHOOLS) {
-    await School.updateOne(
-      { schoolName: school.schoolName },
-      { $set: { ...school, status: "active" } },
-      { upsert: true }
-    );
-  }
-
   let admin = await User.findOne({ email: ADMIN.email });
   if (!admin) {
     admin = await User.create({
@@ -138,7 +124,6 @@ try {
     );
   }
 
-  console.log(`Partner schools ready: ${SCHOOLS.length}`);
   console.log(`Courses ready: ${courses.length}`);
   console.log(`Demo laptop units ready: ${demoUnits.length}`);
   console.log(`Users in ${mongoose.connection.name}: ${await User.countDocuments()}`);

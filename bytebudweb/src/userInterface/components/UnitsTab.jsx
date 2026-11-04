@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Drawer, Field, Pagination, StatusBadge, CheckIcon, CrossIcon, ImageIcon, PlusIcon, TrashIcon,
   GRADES, UNIT_STATUSES, formatDate, formatDateTime, formatPeso, fromLocalInput, toLocalInput, toNumber,
-} from "./AdminShared";
+} from "../pages/AdminShared.jsx";
 
 /**
  * B2 > Units tab: table + [Add unit] + drawer with sub-tabs (Details | Inspection | Repairs | Listing).

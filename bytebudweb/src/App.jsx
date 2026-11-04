@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import AuthPage from "./userInterface/pages/AuthPage.jsx";
 import HomePage from "./userInterface/pages/HomePage.jsx";
-import { fetchHomeCatalog, fetchMe, getToken, login, logout, register } from "./api.js";
+import { fetchHomeCatalog, fetchMe, forgotPassword, getToken, login, logout, register } from "./api.js";
 import AdminConsole from "./userInterface/pages/AdminConsole.jsx";
+import PasswordResetPage from "./userInterface/pages/PasswordResetPage.jsx";
 
 /**
  * Restores the session and routes buyers to the storefront and staff/admin users to /admin.
@@ -14,6 +15,7 @@ export default function App() {
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [catalogError, setCatalogError] = useState("");
   const [pathname, setPathname] = useState(window.location.pathname);
+  const resetToken = new URLSearchParams(window.location.search).get("resetToken");
 
   useEffect(() => {
     const onPop = () => setPathname(window.location.pathname);
@@ -75,12 +77,15 @@ export default function App() {
     };
   }, [session]);
 
+  if (resetToken) return <PasswordResetPage token={resetToken} />;
+
   if (checking) return null;
 
   if (!session) {
     return (
       <AuthPage
-        showForgotPassword={false}
+        showForgotPassword
+        onForgotPassword={forgotPassword}
         onLogin={async (credentials) => {
           const next = await login(credentials);
           setSession(next);

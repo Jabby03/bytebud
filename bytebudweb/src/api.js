@@ -39,6 +39,9 @@ export async function login(credentials) {
   return { user: data.user, verification: data.verification };
 }
 
+export const forgotPassword = (payload) => request("/api/auth/forgot-password", { method: "POST", body: payload });
+export const resetPassword = (payload) => request("/api/auth/reset-password", { method: "POST", body: payload });
+
 export const fetchMe = () => request("/api/auth/me");
 export const fetchHomeCatalog = () => request("/api/catalog/home");
 export const adminRequest = (path, options) => request(`/api/admin${path}`, options);

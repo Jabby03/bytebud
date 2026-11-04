@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import {
   Drawer, Field, Modal, Pagination, StatusBadge, PlusIcon, TrashIcon,
   ACQ_STATUSES, SOURCE_TYPES, formatDate, formatPeso, fromDateInput, labelOf, toDateInput, toNumber,
-} from "./AdminShared";
+} from "../pages/AdminShared.jsx";
 
 /**
  * B2 > Acquisitions tab: table + [New acquisition] form (drawer) + [Split into units].

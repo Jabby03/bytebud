@@ -9,8 +9,8 @@ import "./AuthPage.css";
  *     initialMode="login"             // "login" | "register"
  *     logoSrc="/logo.svg"             // optional: leave out to show the placeholder
  *     onLogin={async ({ email, password }) => { ... }}
- *     onRegister={async ({ fullName, phone, email, password, isStudent, schoolEmail }) => { ... }}
- *     showForgotPassword={false}      // forgot password is postponed: hidden by default
+ *     onRegister={async ({ fullName, phone, email, password }) => { ... }}
+ *     showForgotPassword             // display the forgot-password link on login
  *     onForgotPassword={async ({ email }) => { ... }}
  *     onSuccess={() => navigate("/")} // runs after a successful login/register
  *   />
@@ -19,12 +19,9 @@ import "./AuthPage.css";
  *  - Send the plain password over HTTPS only; hash it server-side into Users.passwordHash.
  *  - Register always creates Users.role = "buyer" (never trust a role from the client).
  *  - After login, route by Users.role: buyer -> storefront, staff/admin -> /admin.
- *  - If isStudent is true: match schoolEmail's domain against the partner-school
- *    lookup, then create Student_Verifications { userId, schoolEmail, verifStatus: "pending" }.
- *  - onForgotPassword: email a time-limited reset link to the address if an account exists.
- *    Return the same result either way so the form never reveals which emails are registered.
+ *  - onForgotPassword requests a time-limited reset token. Email delivery is configured separately.
  *  - Throw an Error with a readable message from onLogin/onRegister to show it in the form
- *    (e.g. "Incorrect email or password.", "That school email domain is not a partner school.").
+ *    (e.g. "Incorrect email or password.").
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,8 +31,6 @@ const EMPTY_FORM = {
   phone: "",
   email: "",
   password: "",
-  isStudent: false,
-  schoolEmail: "",
 };
 
 // Placeholder handlers so the page works before the API is connected.
@@ -152,6 +147,7 @@ export default function AuthPage({
   const [forgotError, setForgotError] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [forgotResetUrl, setForgotResetUrl] = useState("");
   const forgotDialogRef = useRef(null);
   const forgotEmailRef = useRef(null);
 
@@ -215,6 +211,7 @@ export default function AuthPage({
     setForgotEmail(form.email.trim());
     setForgotError("");
     setForgotSent(false);
+    setForgotResetUrl("");
     setForgotLoading(false);
     setForgotOpen(true);
   };
@@ -238,7 +235,8 @@ export default function AuthPage({
     setForgotLoading(true);
     setForgotError("");
     try {
-      await onForgotPassword({ email: email.toLowerCase() });
+      const result = await onForgotPassword({ email: email.toLowerCase() });
+      setForgotResetUrl(result?.resetUrl || "");
       setForgotSent(true);
     } catch (error) {
       setForgotError(error?.message || "Something went wrong. Please try again.");
@@ -278,14 +276,6 @@ export default function AuthPage({
     } else if (isRegister && form.password.length < 8) {
       next.password = "Use at least 8 characters.";
     }
-    if (isRegister && form.isStudent) {
-      const schoolEmail = form.schoolEmail.trim();
-      if (!schoolEmail) {
-        next.schoolEmail = "Enter your school email to verify your student status.";
-      } else if (!EMAIL_RE.test(schoolEmail)) {
-        next.schoolEmail = "Enter a valid school email address.";
-      }
-    }
     return next;
   };
 
@@ -307,8 +297,6 @@ export default function AuthPage({
           phone: form.phone.trim(),
           email: form.email.trim().toLowerCase(),
           password: form.password,
-          isStudent: form.isStudent,
-          schoolEmail: form.isStudent ? form.schoolEmail.trim().toLowerCase() : null,
         });
       } else {
         await onLogin({
@@ -336,7 +324,7 @@ export default function AuthPage({
           <h1 className="ap-title">{isRegister ? "Create your account" : "Welcome back"}</h1>
           <p className="ap-subtitle">
             {isRegister
-              ? "Sign up to reserve laptops, check out, and get student pricing."
+              ? "Sign up to reserve laptops and check out."
               : "Log in to reserve laptops and track your orders."}
           </p>
 
@@ -463,49 +451,6 @@ export default function AuthPage({
               )}
             </div>
 
-            {isRegister && (
-              <div className="ap-student">
-                <label className="ap-check" htmlFor="ap-student">
-                  <input
-                    id="ap-student"
-                    type="checkbox"
-                    checked={form.isStudent}
-                    onChange={(e) => setField("isStudent", e.target.checked)}
-                  />
-                  <span className="ap-check-box" aria-hidden="true" />
-                  <span className="ap-check-text">
-                    I'm a student
-                    <small>Get student pricing after we verify your school.</small>
-                  </span>
-                </label>
-
-                {form.isStudent && (
-                  <div className="ap-field ap-field-nested">
-                    <label htmlFor="ap-school-email">School email</label>
-                    <input
-                      id="ap-school-email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@school.edu.ph"
-                      value={form.schoolEmail}
-                      onChange={(e) => setField("schoolEmail", e.target.value)}
-                      aria-invalid={!!errors.schoolEmail}
-                      aria-describedby={errors.schoolEmail ? "ap-school-error" : "ap-school-hint"}
-                    />
-                    {errors.schoolEmail ? (
-                      <p className="ap-error" id="ap-school-error">
-                        {errors.schoolEmail}
-                      </p>
-                    ) : (
-                      <p className="ap-hint" id="ap-school-hint">
-                        Use the email your partner school gave you. You can upload proof later from your account.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
             <button type="submit" className="ap-submit" disabled={loading}>
               {loading ? (
                 <>
@@ -583,19 +528,23 @@ export default function AuthPage({
                 <div className="ap-fp-icon is-success">
                   <MailCheckIcon />
                 </div>
-                <h2 id="ap-fp-title" className="ap-fp-title">
-                  Check your email
-                </h2>
-                <p className="ap-fp-text">
-                  If an account exists for <strong>{forgotEmail.trim()}</strong>, we've sent a link to reset your
-                  password. The link expires soon, so use it right away.
-                </p>
+                <h2 id="ap-fp-title" className="ap-fp-title">Reset link requested</h2>
+                {forgotResetUrl ? (
+                  <>
+                    <p className="ap-fp-text">A one-use reset link was created for this local development account. It expires in one hour.</p>
+                    <a className="ap-submit ap-fp-reset-link" href={forgotResetUrl}>Continue to reset password</a>
+                  </>
+                ) : (
+                  <p className="ap-fp-text">
+                    If an account exists for <strong>{forgotEmail.trim()}</strong>, reset instructions will be sent when email delivery is configured.
+                  </p>
+                )}
                 <button type="button" className="ap-submit" onClick={closeForgot}>
                   Back to log in
                 </button>
                 <p className="ap-switch">
-                  Didn't get it?{" "}
-                  <button type="button" className="ap-link" onClick={() => setForgotSent(false)}>
+                  Need another link?{" "}
+                  <button type="button" className="ap-link" onClick={() => { setForgotSent(false); setForgotResetUrl(""); }}>
                     Try again
                   </button>
                 </p>

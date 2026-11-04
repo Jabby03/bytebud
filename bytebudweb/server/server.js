@@ -5,8 +5,9 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { createHash, randomBytes } from "node:crypto";
 import {
-  Acquisition, AuditLog, Course, LaptopModel, Order, School,
+  Acquisition, AuditLog, Course, LaptopModel, Order, PasswordReset,
   StudentVerification, Supplier, Unit, User, Warranty,
 } from "./models.js";
 
@@ -45,13 +46,6 @@ async function sessionPayload(user) {
     user: publicUser(user),
     verification: await latestVerification(user._id),
   };
-}
-
-// Matches the school email's domain against Schools.emailDomains (subdomains allowed).
-async function findSchoolByEmail(email) {
-  const domain = email.split("@")[1];
-  const schools = await School.find({ status: "active" });
-  return schools.find((s) => s.emailDomains.some((d) => domain === d || domain.endsWith(`.${d}`))) || null;
 }
 
 const requireAuth = async (req, res, next) => {
@@ -160,11 +154,11 @@ app.get("/api/catalog/home", async (_req, res) => {
   }
 });
 
-// Register: always creates a buyer. Student sign-ups also create a pending verification.
+// Public registration creates buyer accounts only. Admin and staff accounts are managed in /admin.
 app.post("/api/auth/register", async (req, res) => {
   let createdUser = null;
   try {
-    const { fullName, phone, email, password, isStudent, schoolEmail } = req.body || {};
+    const { fullName, phone, email, password } = req.body || {};
 
     if (!fullName?.trim()) return res.status(400).json({ message: "Enter your full name." });
     if (!EMAIL_RE.test(email || "")) return res.status(400).json({ message: "Enter a valid email address." });
@@ -173,19 +167,6 @@ app.post("/api/auth/register", async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     if (await User.exists({ email: cleanEmail })) {
       return res.status(409).json({ message: "An account with this email already exists." });
-    }
-
-    let school = null;
-    let cleanSchoolEmail = null;
-    if (isStudent) {
-      cleanSchoolEmail = (schoolEmail || "").trim().toLowerCase();
-      if (!EMAIL_RE.test(cleanSchoolEmail)) {
-        return res.status(400).json({ message: "Enter a valid school email address." });
-      }
-      school = await findSchoolByEmail(cleanSchoolEmail);
-      if (!school) {
-        return res.status(400).json({ message: "That school email domain is not a partner school." });
-      }
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -197,23 +178,78 @@ app.post("/api/auth/register", async (req, res) => {
       role: "buyer",
     });
 
-    if (school) {
-      await StudentVerification.create({
-        userId: createdUser._id,
-        schoolEmail: cleanSchoolEmail,
-        verifStatus: "pending",
-      });
-    }
-
     res.status(201).json(await sessionPayload(createdUser));
   } catch (error) {
-    // Roll back the user if the verification record could not be created.
+    // Roll back the account if preparing its initial session fails.
     if (createdUser) await User.deleteOne({ _id: createdUser._id }).catch(() => {});
     if (error?.code === 11000) {
       return res.status(409).json({ message: "An account with this email already exists." });
     }
     console.error(error);
     res.status(500).json({ message: "Something went wrong. Please try again." });
+  }
+});
+
+app.post("/api/auth/forgot-password", async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    if (!EMAIL_RE.test(email)) return res.status(400).json({ message: "Enter a valid email address." });
+
+    const user = await User.findOne({ email, isActive: true });
+    if (!user) return res.json({ message: "If an active account matches that email, reset instructions are available." });
+
+    const token = randomBytes(32).toString("hex");
+    const resetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+
+    await PasswordReset.updateMany(
+      { userId: user._id, resetUsedAt: null },
+      { $set: { resetUsedAt: new Date() } }
+    );
+    await PasswordReset.create({ userId: user._id, tokenHash, resetExpiresAt });
+
+    const result = { message: "If an active account matches that email, reset instructions are available." };
+    // Email delivery is not configured yet. Expose a link only in local development.
+    if (process.env.NODE_ENV !== "production") {
+      const origin = (process.env.CLIENT_ORIGIN || "http://localhost:5173").replace(/\/$/, "");
+      result.resetUrl = `${origin}/?resetToken=${token}`;
+    }
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Could not prepare a password reset. Please try again." });
+  }
+});
+
+app.post("/api/auth/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body || {};
+    if (typeof token !== "string" || !token || typeof password !== "string" || password.length < 8)
+      return res.status(400).json({ message: "Use a valid reset link and a password with at least 8 characters." });
+
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const reset = await PasswordReset.findOneAndUpdate(
+      { tokenHash, resetUsedAt: null, resetExpiresAt: { $gt: new Date() } },
+      { $set: { resetUsedAt: new Date() } },
+      { new: true }
+    );
+    if (!reset) return res.status(400).json({ message: "This reset link is invalid, expired, or already used." });
+
+    const user = await User.findOneAndUpdate(
+      { _id: reset.userId, isActive: true },
+      { $set: { passwordHash: await bcrypt.hash(password, 10) } },
+      { new: true }
+    );
+    if (!user) return res.status(400).json({ message: "This reset link is invalid, expired, or already used." });
+
+    await PasswordReset.updateMany(
+      { userId: user._id, resetUsedAt: null },
+      { $set: { resetUsedAt: new Date() } }
+    );
+    res.json({ message: "Password updated. You can now log in with your new password." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Could not reset the password. Please try again." });
   }
 });
 

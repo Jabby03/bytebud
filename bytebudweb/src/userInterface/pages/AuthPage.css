@@ -172,8 +172,8 @@ body,
 
 .ap-name-phone-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
 }
 
 .ap-optional {
@@ -282,76 +282,6 @@ body,
   color: var(--ap-danger);
 }
 
-/* Student checkbox */
-.ap-student {
-  padding: 15px;
-  border: 1px solid var(--ap-border);
-  border-radius: 12px;
-  background: #fbfafb;
-}
-
-.ap-check {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-}
-
-.ap-check input {
-  position: absolute;
-  opacity: 0;
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  cursor: pointer;
-}
-
-.ap-check-box {
-  flex: 0 0 20px;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  border: 1.5px solid #bdb8be;
-  border-radius: 6px;
-  background: var(--ap-surface);
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.ap-check input:checked + .ap-check-box {
-  border-color: var(--ap-burgundy);
-  background: var(--ap-burgundy)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 10.5l3.2 3.2L15 6.8' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / 100% no-repeat;
-}
-
-.ap-check input:focus-visible + .ap-check-box {
-  box-shadow: 0 0 0 3px rgba(122, 18, 48, 0.3);
-}
-
-.ap-check-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ap-text);
-}
-
-.ap-check-text small {
-  font-size: 12.5px;
-  font-weight: 400;
-  line-height: 1.45;
-  color: var(--ap-muted);
-}
-
-.ap-field-nested {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--ap-border);
-  animation: ap-fade 0.18s ease-out;
-}
-
 /* Submit */
 .ap-submit {
   display: inline-flex;
@@ -371,6 +301,8 @@ body,
   cursor: pointer;
   transition: background 0.15s, transform 0.05s;
 }
+
+.ap-fp-reset-link { text-decoration: none; }
 
 .ap-submit:hover:not(:disabled) {
   background: var(--ap-burgundy-dark);
@@ -733,7 +665,6 @@ body,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ap-field-nested,
   .ap-fp-overlay,
   .ap-fp-modal,
   .ap-spinner {
