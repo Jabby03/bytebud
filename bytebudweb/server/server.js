@@ -14,32 +14,7 @@ import {
 dotenv.config({ path: fileURLToPath(new URL("./.env", import.meta.url)), override: true });
 
 const app = express();
-const configuredClientOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-const isLocalNetworkClient = (origin) => {
-  try {
-    const url = new URL(origin);
-    const host = url.hostname;
-    const privateIpv4 = /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)
-      || /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host)
-      || /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(host);
-    return url.protocol === "http:" && url.port === "5173"
-      && (host === "localhost" || host === "127.0.0.1" || privateIpv4);
-  } catch {
-    return false;
-  }
-};
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || configuredClientOrigins.includes(origin) || isLocalNetworkClient(origin)) {
-      callback(null, true);
-      return;
-    }
-    callback(null, false);
-  },
-}));
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
 app.use(express.json({ limit: "8mb" }));
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -428,10 +403,7 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     const result = { message: "If an active account matches that email, reset instructions are available." };
     // Email delivery is not configured yet. Expose a link only in local development.
     if (process.env.NODE_ENV !== "production") {
-      const requestOrigin = req.get("origin");
-      const origin = requestOrigin && (configuredClientOrigins.includes(requestOrigin) || isLocalNetworkClient(requestOrigin))
-        ? requestOrigin
-        : (configuredClientOrigins[0] || "http://localhost:5173");
+      const origin = (process.env.CLIENT_ORIGIN || "http://localhost:5173").replace(/\/$/, "");
       result.resetUrl = `${origin}/?resetToken=${token}`;
     }
     res.json(result);
@@ -945,7 +917,7 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("Connected to MongoDB:", mongoose.connection.name);
-    app.listen(port, "0.0.0.0", () => console.log(`API running on port ${port}`));
+    app.listen(port, () => console.log(`API running on http://localhost:${port}`));
   })
   .catch((error) => {
     console.error("MongoDB connection failed:", error.message);

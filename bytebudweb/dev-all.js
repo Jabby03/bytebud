@@ -26,7 +26,13 @@ function start(label, args, cwd) {
       pending += chunk.toString();
       const lines = pending.split(/\r?\n/);
       pending = lines.pop() || "";
-      for (const line of lines) output.write(`[${label}] ${line}\n`);
+      for (const line of lines) {
+        output.write(`[${label}] ${line}\n`);
+        if (label === "api" && line.includes("EADDRINUSE")) {
+          process.stderr.write("[dev] Port 5000 is already in use. Stop the other API process, then run npm run dev again.\n");
+          stopAll(1);
+        }
+      }
     });
     stream.on("end", () => {
       if (pending) output.write(`[${label}] ${pending}\n`);
@@ -49,5 +55,29 @@ function start(label, args, cwd) {
 process.on("SIGINT", () => stopAll(0));
 process.on("SIGTERM", () => stopAll(0));
 
-start("web", [resolve(root, "node_modules/vite/bin/vite.js")], root);
-start("api", ["--watch", "server.js"], server);
+async function startDevelopment() {
+  let existingApi;
+  try {
+    const response = await fetch("http://127.0.0.1:5000/api/health", { signal: AbortSignal.timeout(1500) });
+    existingApi = response.ok && (await response.json()).ok === true;
+    if (!existingApi) {
+      process.stderr.write("[dev] Port 5000 is responding, but it is not a healthy ByteBud API. Stop the process using that port before starting the API.\n");
+      process.exitCode = 1;
+      return;
+    }
+  } catch {
+    // No API is listening yet, so start one below.
+  }
+
+  start("web", [resolve(root, "node_modules/vite/bin/vite.js")], root);
+  if (existingApi) {
+    process.stdout.write("[api] Reusing the ByteBud API already running on port 5000.\n");
+  } else {
+    start("api", ["--watch", "server.js"], server);
+  }
+}
+
+startDevelopment().catch((error) => {
+  process.stderr.write(`[dev] Could not start development servers: ${error.message}\n`);
+  stopAll(1);
+});

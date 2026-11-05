@@ -1,7 +1,5 @@
-// Use an explicit API URL when configured; otherwise target port 5000 on the
-// same computer name/IP that served the frontend (works for LAN devices too).
-const API_URL = import.meta.env.VITE_API_URL
-  || `${window.location.protocol}//${window.location.hostname}:5000`;
+// Talks to the local ByteBud API. Set VITE_API_URL in .env if it uses another URL.
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const TOKEN_KEY = "bytebud_token";
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
