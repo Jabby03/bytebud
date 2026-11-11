@@ -12,7 +12,7 @@ const timestamps = (createdAt, updatedAt) => ({
 });
 const nonNegative = { type: Number, min: 0 };
 
-/* ---------- USERS ---------- */
+/* ---------- 1. USERS ---------- */
 const userSchema = new Schema(
   {
     fullName: { type: String, required: true, trim: true },
@@ -25,7 +25,7 @@ const userSchema = new Schema(
   { collection: "users", ...timestamps("userCreatedAt", "userUpdatedAt") }
 );
 
-/* ---------- STUDENT_VERIFICATIONS ---------- */
+/* ---------- 2. STUDENT_VERIFICATIONS ---------- */
 const studentVerificationSchema = new Schema(
   {
     userId: { type: ObjectId, ref: "User", required: true, index: true },
@@ -41,7 +41,7 @@ const studentVerificationSchema = new Schema(
   { collection: "student_verifications", ...timestamps("verifCreatedAt", "verifUpdatedAt") }
 );
 
-/* ---------- PASSWORD_RESETS ---------- */
+/* ---------- 3. PASSWORD_RESETS ---------- */
 const passwordResetSchema = new Schema(
   {
     userId: { type: ObjectId, ref: "User", required: true, index: true },
@@ -52,7 +52,7 @@ const passwordResetSchema = new Schema(
   { collection: "password_resets", ...timestamps("resetCreatedAt", false) }
 );
 
-/* ---------- SUPPLIERS ---------- */
+/* ---------- 4. SUPPLIERS ---------- */
 const supplierContactSchema = embedded({
   contactPerson: { type: String, default: "" },
   contactEmail: { type: String, lowercase: true, trim: true, default: "" },
@@ -68,7 +68,7 @@ const supplierSchema = new Schema(
   { collection: "suppliers", ...timestamps("supplierCreatedAt", "supplierUpdatedAt") }
 );
 
-/* ---------- LAPTOP_MODELS ---------- */
+/* ---------- 5. LAPTOP_MODELS ---------- */
 const laptopSpecsSchema = embedded({
   cpuName: { type: String, default: "" },
   cpuTier: { type: Number, min: 0, default: null },
@@ -94,7 +94,7 @@ const laptopModelSchema = new Schema(
   { collection: "laptop_models", ...timestamps("modelCreatedAt", "modelUpdatedAt") }
 );
 
-/* ---------- ACQUISITIONS ---------- */
+/* ---------- 6. ACQUISITIONS ---------- */
 const acquisitionItemSchema = embedded({
   modelId: { type: ObjectId, ref: "LaptopModel", required: true },
   quantity: { type: Number, required: true, min: 1, validate: Number.isInteger },
@@ -115,7 +115,7 @@ const acquisitionSchema = new Schema(
   { collection: "acquisitions", ...timestamps("acqCreatedAt", "acqUpdatedAt") }
 );
 
-/* ---------- COURSES ---------- */
+/* ---------- 7. COURSES ---------- */
 const courseRequirementsSchema = embedded({
   minRamGb: { type: Number, min: 0, default: null },
   minStorageGb: { type: Number, min: 0, default: null },
@@ -134,7 +134,7 @@ const courseSchema = new Schema(
   { collection: "courses", ...timestamps("courseCreatedAt", "courseUpdatedAt") }
 );
 
-/* ---------- UNITS ---------- */
+/* ---------- 8. UNITS ---------- */
 const actualSpecsSchema = embedded({
   actualRamGb: { type: Number, min: 0, default: null },
   actualStorageGb: { type: Number, min: 0, default: null },
@@ -198,7 +198,7 @@ const unitSchema = new Schema(
   { collection: "units", ...timestamps("unitCreatedAt", "unitUpdatedAt") }
 );
 
-/* ---------- CARTS ---------- */
+/* ---------- 9. CARTS ---------- */
 const cartItemSchema = embedded({
   unitId: { type: ObjectId, ref: "Unit", required: true },
   addedAt: { type: Date, default: Date.now },
@@ -212,7 +212,7 @@ const cartSchema = new Schema(
   { collection: "carts", ...timestamps("cartCreatedAt", "cartUpdatedAt") }
 );
 
-/* ---------- ORDERS ---------- */
+/* ---------- 10. ORDERS ---------- */
 const paymentSchema = embedded({
   method: { type: String, default: "" },
   payStatus: { type: String, default: "" },
@@ -269,7 +269,7 @@ const orderSchema = new Schema(
   { collection: "orders", ...timestamps("orderCreatedAt", "orderUpdatedAt") }
 );
 
-/* ---------- WARRANTIES ---------- */
+/* ---------- 11. WARRANTIES ---------- */
 const warrantyClaimSchema = embedded({
   claimNo: { type: String, default: "" },
   claimType: { type: String, default: "" },
@@ -296,7 +296,7 @@ const warrantySchema = new Schema(
   { collection: "warranties", ...timestamps("warrantyCreatedAt", "warrantyUpdatedAt") }
 );
 
-/* ---------- AUDIT_LOGS ---------- */
+/* ---------- 12. AUDIT_LOGS ---------- */
 const auditChangesSchema = embedded({
   before: { type: Schema.Types.Mixed, default: null },
   after: { type: Schema.Types.Mixed, default: null },

@@ -52,6 +52,7 @@ export default function AdminLayout({
   searchValue = "",
   onSearchChange,
   onSearchSubmit,
+  showSearch = true,
   searchPlaceholder = "Search serial number, order no, or email",
   onNavigate,
   onLogout,
@@ -138,7 +139,7 @@ export default function AdminLayout({
             </svg>
           </button>
 
-          <form
+          {showSearch && <form
             className="al-search"
             role="search"
             onSubmit={(e) => {
@@ -154,7 +155,7 @@ export default function AdminLayout({
               placeholder={searchPlaceholder}
               aria-label="Search"
             />
-          </form>
+          </form>}
 
           <div className="al-profile" ref={profileRef}>
             <button type="button" className="al-profile-btn" onClick={() => setProfileOpen((o) => !o)} aria-haspopup="menu" aria-expanded={profileOpen}>

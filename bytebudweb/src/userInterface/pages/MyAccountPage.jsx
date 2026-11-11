@@ -610,7 +610,7 @@ function ProofModal({ defaultEmail, onClose, onSubmit }) {
             id="ma-school-email"
             type="email"
             autoComplete="email"
-            placeholder={defaultEmail ? `For example, ${defaultEmail}` : "name@school.edu.ph"}
+            placeholder={defaultEmail ? `For example, @1ustp.edu.ph` : "name@school.edu.ph"}
             value={schoolEmail}
             onChange={(e) => setSchoolEmail(e.target.value)}
             aria-invalid={errors.schoolEmail ? "true" : undefined}

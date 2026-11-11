@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import AdminLayout from "./AdminLayout";
 import { UNIT_STATUSES, formatPeso, timeAgo } from "./AdminShared";
 import "./AdminDashboard.css";
@@ -76,8 +76,6 @@ export default function AdminDashboard({
   error = "",
   onRetry,
 }) {
-  const [search, setSearch] = useState("");
-
   const data = useMemo(() => {
     const now = new Date();
     const y = now.getFullYear();
@@ -170,9 +168,7 @@ export default function AdminDashboard({
       active="dashboard"
       admin={admin}
       badges={{ verifications: data.pendingVerifications }}
-      searchValue={search}
-      onSearchChange={setSearch}
-      onSearchSubmit={(q) => q.trim() && onNavigate?.(`/admin/inventory?search=${encodeURIComponent(q.trim())}`)}
+      showSearch={false}
       onNavigate={onNavigate}
       onLogout={onLogout}
     >

@@ -16,6 +16,13 @@ const titles = {
   orders: "Orders & Returns", verifications: "Student verifications", catalog: "Catalog",
   users: "Users", audit: "Audit log",
 };
+const searchPlaceholders = {
+  orders: "Search order number, customer, return, or claim",
+  verifications: "Search buyer name, school email, or status",
+  users: "Search name, email, phone, or role",
+  audit: "Search actor, action, collection, or record ID",
+  catalog: "Search catalog records",
+};
 const labels = {
   orderNo: "Order", fullName: "Name", email: "Email", phone: "Phone", role: "Role", isActive: "Active",
   verifStatus: "Status", schoolEmail: "School email", expiresAt: "Expires", companyName: "Supplier", sourceType: "Source",
@@ -38,9 +45,15 @@ export default function AdminConsole({ admin, pathname, onNavigate, onLogout }) 
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [inventoryTab, setInventoryTab] = useState("units");
+  const [ordersTab, setOrdersTab] = useState("orders");
+  const [catalogTab, setCatalogTab] = useState("laptop_models");
   const page = pageFromPath(pathname);
   const isAdmin = admin.role === "admin";
   const routeParams = new URLSearchParams(window.location.search);
+
+  useEffect(() => {
+    setSearch("");
+  }, [page]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -91,7 +104,7 @@ export default function AdminConsole({ admin, pathname, onNavigate, onLogout }) 
       <>
         <div className="ad-tabs" role="tablist" aria-label="Inventory sections">
           {["units", ...(isAdmin ? ["acquisitions", "suppliers"] : [])].map((tab) => (
-            <button type="button" role="tab" aria-selected={inventoryTab === tab} className={`ad-tab ${inventoryTab === tab ? "is-active" : ""}`} key={tab} onClick={() => setInventoryTab(tab)}>
+            <button type="button" role="tab" aria-selected={inventoryTab === tab} className={`ad-tab ${inventoryTab === tab ? "is-active" : ""}`} key={tab} onClick={() => { setInventoryTab(tab); setSearch(""); }}>
               {tab[0].toUpperCase() + tab.slice(1)}
             </button>
           ))}
@@ -110,31 +123,61 @@ export default function AdminConsole({ admin, pathname, onNavigate, onLogout }) 
     );
     if (page === "verifications") return <RecordsTable title={titles.verifications} collection="student_verifications" rows={data.student_verifications} users={data.users}
       admin={admin} query={search} refresh={refresh} />;
-    if (page === "orders") return <RecordsTable title={titles.orders} collection="orders" rows={data.orders} warranties={data.warranties} users={data.users} units={data.units} admin={admin} query={search} refresh={refresh} />;
+    if (page === "orders") return <>
+      <div className="ad-tabs" role="tablist" aria-label="Orders and after-sales sections">
+        {[ ["orders", "Orders"], ["returns", "Returns"], ["claims", "Warranty claims"] ].map(([tab, label]) => <button type="button" role="tab" aria-selected={ordersTab === tab} className={`ad-tab ${ordersTab === tab ? "is-active" : ""}`} key={tab} onClick={() => { setOrdersTab(tab); setSearch(""); }}>{label}</button>)}
+      </div>
+      <RecordsTable title={ordersTab === "claims" ? "Warranty claims" : ordersTab === "returns" ? "Return requests" : "Orders"} collection="orders" view={ordersTab} rows={data.orders} warranties={data.warranties} users={data.users} units={data.units} admin={admin} query={search} refresh={refresh} />
+    </>;
     if (page === "users" && isAdmin) return <RecordsTable title={titles.users} collection="users" rows={data.users} admin={admin} query={search} refresh={refresh} />;
     if (page === "audit" && isAdmin) return <RecordsTable title={titles.audit} collection="audit_logs" rows={data.audit_logs} users={data.users} admin={admin} query={search} refresh={refresh} />;
-    if (page === "catalog") return <RecordsTable title={titles.catalog} collection="catalog" rows={[...data.laptop_models.map((x) => ({ ...x, _kind: "laptop_models" })), ...data.courses.map((x) => ({ ...x, _kind: "courses" }))]} admin={admin} query={search} refresh={refresh} />;
+    if (page === "catalog") return <>
+      <div className="ad-tabs" role="tablist" aria-label="Catalog sections">
+        {[ ["laptop_models", "Laptop models"], ["courses", "Courses"] ].map(([tab, label]) => <button type="button" role="tab" aria-selected={catalogTab === tab} className={`ad-tab ${catalogTab === tab ? "is-active" : ""}`} key={tab} onClick={() => { setCatalogTab(tab); setSearch(""); }}>{label}</button>)}
+      </div>
+      <RecordsTable title={catalogTab === "courses" ? "Courses" : "Laptop models"} collection="catalog" rows={(catalogTab === "courses" ? data.courses : data.laptop_models).map((x) => ({ ...x, _kind: catalogTab }))} admin={admin} query={search} refresh={refresh} />
+    </>;
     return <div className="ad-empty"><strong>Page not found</strong><button className="ad-btn ad-btn-primary" onClick={() => onNavigate("/admin")}>Back to dashboard</button></div>;
   };
 
   const restricted = (["users", "audit"].includes(page) && !isAdmin) || !["inventory", "orders", "verifications", "catalog", "users", "audit"].includes(page);
+  const searchPlaceholder = page === "inventory"
+    ? ({ units: "Search serial number or laptop model", acquisitions: "Search invoice or supplier", suppliers: "Search supplier or contact" }[inventoryTab] || "Search inventory")
+    : page === "orders" && ordersTab === "returns"
+      ? "Search order, buyer, laptop serial, or return reason"
+      : page === "orders" && ordersTab === "claims"
+        ? "Search claim, buyer, laptop serial, or claim status"
+        : (searchPlaceholders[page] || "Search this section");
   return <AdminLayout active={restricted ? "dashboard" : active} admin={admin} badges={{ verifications: badgeCount }}
-    searchValue={search} onSearchChange={setSearch} onSearchSubmit={setSearch} onNavigate={onNavigate} onLogout={onLogout}>
+    showSearch={!restricted} searchValue={search} onSearchChange={setSearch} onSearchSubmit={setSearch} searchPlaceholder={searchPlaceholder} onNavigate={onNavigate} onLogout={onLogout}>
     <div className="db-head"><div><h1>{restricted ? "Access denied" : page === "inventory" ? "Inventory" : titles[page]}</h1>
       <p>{restricted ? "This section is only available to administrators." : `Manage ByteBud ${page === "audit" ? "activity history" : page.replace("_", " ")}.`}</p></div></div>
     {restricted ? <div className="ad-empty"><strong>Admin role required</strong>Ask an administrator if you need access to this section.</div> : content()}
   </AdminLayout>;
 }
 
-function RecordsTable({ title, collection, rows, warranties = [], users = [], units = [], admin, query, refresh }) {
+function RecordsTable({ title, collection, view = "", rows, warranties = [], users = [], units = [], admin, query, refresh }) {
   const [staffForm, setStaffForm] = useState(false);
   const [staff, setStaff] = useState({ fullName: "", email: "", phone: "", password: "" });
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState(null);
   const [expiresAt, setExpiresAt] = useState("");
   const [auditFilter, setAuditFilter] = useState({ actor: "", action: "", collection: "", from: "", to: "" });
+  const normalizedQuery = query.trim().toLowerCase();
   const filtered = rows.filter((row) => {
-    if (!JSON.stringify(row).toLowerCase().includes(query.trim().toLowerCase())) return false;
+    const relatedUser = users.find((user) => user.userId === row.userId || user.userId === row.adminId);
+    const searchable = collection === "orders"
+      ? [row.orderNo, row.orderStatus, row.payment?.reference, relatedUser?.fullName, relatedUser?.email, relatedUser?.phone]
+      : collection === "student_verifications"
+        ? [relatedUser?.fullName, relatedUser?.email, row.schoolEmail, row.verifStatus, row.remarks]
+        : collection === "users"
+          ? [row.fullName, row.email, row.phone, row.role, row.isActive ? "active" : "inactive"]
+          : collection === "audit_logs"
+            ? [relatedUser?.fullName, row.action, row.targetCollection, row.targetId]
+            : row._kind === "courses"
+              ? [row.courseCode, row.courseName, row.requirements?.reqNotes]
+              : [row.brand, row.modelName, row.msrp, row.specs?.cpuName, row.specs?.gpu];
+    if (normalizedQuery && !searchable.some((value) => String(value ?? "").toLowerCase().includes(normalizedQuery))) return false;
     if (collection !== "audit_logs") return true;
     const d = new Date(row.logCreatedAt);
     return (!auditFilter.actor || String(row.adminId) === auditFilter.actor)
@@ -143,6 +186,18 @@ function RecordsTable({ title, collection, rows, warranties = [], users = [], un
       && (!auditFilter.from || d >= new Date(`${auditFilter.from}T00:00:00`))
       && (!auditFilter.to || d <= new Date(`${auditFilter.to}T23:59:59`));
   });
+  const filteredReturns = collection === "orders" ? rows.flatMap((order) => (order.returns || []).flatMap((item, index) => {
+    const customer = users.find((user) => user.userId === order.userId);
+    const unit = units.find((entry) => entry.unitId === item.returnUnitId);
+    const text = [order.orderNo, customer?.fullName, customer?.email, unit?.serialNumber, item.reason, item.returnStatus].join(" ").toLowerCase();
+    return !normalizedQuery || text.includes(normalizedQuery) ? [{ order, item, index }] : [];
+  })) : [];
+  const filteredClaims = collection === "orders" ? warranties.flatMap((warranty) => (warranty.claims || []).flatMap((claim, index) => {
+    const customer = users.find((user) => user.userId === warranty.userId);
+    const unit = units.find((entry) => entry.unitId === warranty.unitId);
+    const text = [claim.claimNo, claim.claimType, claim.description, claim.claimStatus, customer?.fullName, customer?.email, unit?.serialNumber].join(" ").toLowerCase();
+    return !normalizedQuery || text.includes(normalizedQuery) ? [{ warranty, claim, index }] : [];
+  })) : [];
   if (collection === "student_verifications") filtered.sort((a, b) => Number(b.verifStatus === "pending") - Number(a.verifStatus === "pending") || new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
   const mutate = async (path, options) => {
     setMessage("");
@@ -160,9 +215,11 @@ function RecordsTable({ title, collection, rows, warranties = [], users = [], un
       : collection === "users" ? ["fullName", "email", "phone", "role", "isActive", "userCreatedAt"]
         : collection === "audit_logs" ? ["fullName", "action", "targetCollection", "targetId", "logCreatedAt"]
           : ["_kind", "brand", "modelName", "msrp", "specs", "courseCode", "courseName", "requirements"];
+  const recordCount = collection === "orders" && view === "returns" ? filteredReturns.length
+    : collection === "orders" && view === "claims" ? filteredClaims.length : filtered.length;
   return <section className="ad-panel">
     <h2 className="ad-section-title">{title}</h2>
-    <div className="iv-toolbar"><strong>{filtered.length} records</strong>
+    <div className="iv-toolbar"><strong>{recordCount} records</strong>
       {collection === "users" && admin.role === "admin" && <button className="ad-btn ad-btn-primary" onClick={() => setStaffForm((v) => !v)}>Add staff user</button>}
       {collection === "catalog" && admin.role === "admin" && <CreateCatalogForm refresh={refresh} />}
     </div>
@@ -180,7 +237,7 @@ function RecordsTable({ title, collection, rows, warranties = [], users = [], un
       <label>Temporary password<input required minLength="8" type="password" value={staff.password} onChange={(e) => setStaff({ ...staff, password: e.target.value })} /></label>
       <button className="ad-btn ad-btn-primary">Create staff account</button>
     </form>}
-    <div className="ad-table-wrap"><table className="ad-table"><thead><tr>{fields.map((f) => <th key={f}>{labels[f] || f}</th>)}{collection !== "audit_logs" && <th>Actions</th>}</tr></thead>
+    {(!view || view === "orders") && <div className="ad-table-wrap"><table className="ad-table"><thead><tr>{fields.map((f) => <th key={f}>{labels[f] || f}</th>)}{collection !== "audit_logs" && <th>Actions</th>}</tr></thead>
       <tbody>{filtered.map((row) => {
         const user = users.find((u) => u.userId === row.userId || u.userId === row.adminId);
         const view = { ...row, fullName: user?.fullName || "—" };
@@ -194,26 +251,26 @@ function RecordsTable({ title, collection, rows, warranties = [], users = [], un
           {collection === "users" && row.role !== "admin" && <button className="ad-btn ad-btn-ghost ad-btn-sm" onClick={() => mutate(`/users/${row.userId}/active`, { method: "PATCH", body: { isActive: !row.isActive } })}>{row.isActive ? "Deactivate" : "Activate"}</button>}
           {collection === "catalog" && admin.role === "admin" && <CatalogEdit row={row} refresh={refresh} />}
         </td>}
-      </tr>})}</tbody></table></div>
-    {!filtered.length && <div className="ad-empty"><strong>No records</strong></div>}
+      </tr>})}</tbody></table></div>}
+    {(!view || view === "orders") && !filtered.length && <div className="ad-empty"><strong>No records</strong></div>}
     {collection === "orders" && <>
-      <h2 className="ad-section-title">Return requests</h2>
+      {(view === "returns" || !view) && <><h2 className="ad-section-title">Return requests</h2>
       <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>Order</th><th>Unit</th><th>Reason</th><th>Status</th><th>Requested</th>{admin.role === "admin" && <th>Review</th>}</tr></thead>
-        <tbody>{rows.flatMap((order) => (order.returns || []).map((item, index) => <tr key={`${order.orderId}-${index}`}>
+        <tbody>{filteredReturns.map(({ order, item, index }) => <tr key={`${order.orderId}-${index}`}>
           <td>{order.orderNo}</td><td>{item.returnUnitId}</td><td>{item.reason || "—"}</td><td>{item.returnStatus || "pending"}</td><td>{display("requestedAt", item.requestedAt)}</td>
           {admin.role === "admin" && <td>{["pending", "requested", "filed"].includes(item.returnStatus) ? <>
             <button className="ad-btn ad-btn-primary ad-btn-sm" onClick={() => { const raw = window.prompt("Refund amount (PHP):", "0"); if (raw === null) return; const amount = Number(raw); if (Number.isFinite(amount) && amount >= 0) mutate(`/orders/${order.orderId}/returns/${index}`, { method: "PATCH", body: { returnStatus: "approved", refundAmount: amount } }); }}>Approve</button>{" "}
             <button className="ad-btn ad-btn-ghost ad-btn-sm" onClick={() => mutate(`/orders/${order.orderId}/returns/${index}`, { method: "PATCH", body: { returnStatus: "rejected", refundAmount: 0 } })}>Reject</button>
           </> : formatPeso(item.refundAmount)}</td>}
-        </tr>))}</tbody></table></div>
-      <h2 className="ad-section-title">Warranty claims</h2>
+        </tr>)}</tbody></table></div>{!filteredReturns.length && <div className="ad-empty"><strong>No return requests</strong></div>}</>}
+      {(view === "claims" || !view) && <><h2 className="ad-section-title">Warranty claims</h2>
       <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>Claim</th><th>Type</th><th>Description</th><th>Status</th><th>Filed</th><th>Update</th></tr></thead>
-        <tbody>{warranties.flatMap((warranty) => (warranty.claims || []).map((claim, index) => <tr key={`${warranty.warrantyId}-${index}`}>
+        <tbody>{filteredClaims.map(({ warranty, claim, index }) => <tr key={`${warranty.warrantyId}-${index}`}>
           <td>{claim.claimNo || warranty.warrantyId}</td><td>{claim.claimType || "—"}</td><td>{claim.description || "—"}</td><td>{claim.claimStatus || "—"}</td><td>{display("filedAt", claim.filedAt)}</td>
           <td><select value={claim.claimStatus} onChange={(e) => mutate(`/warranties/${warranty.warrantyId}/claims/${index}`, { method: "PATCH", body: { claimStatus: e.target.value, resolution: claim.resolution } })}>
             {["filed", "in_review", "approved", "rejected", "resolved"].map((s) => <option key={s} value={s}>{s}</option>)}
           </select></td>
-        </tr>))}</tbody></table></div>
+        </tr>)}</tbody></table></div>{!filteredClaims.length && <div className="ad-empty"><strong>No warranty claims</strong></div>}</>}
     </>}
     {selected && collection === "student_verifications" && <Drawer open onClose={() => setSelected(null)} title="Student verification" subtitle={users.find((u) => u.userId === selected.userId)?.fullName || selected.userId}>
       <section className="ad-section"><h3 className="ad-section-title">Submission</h3><p><b>School email:</b> {selected.schoolEmail}</p><p><b>Status:</b> {selected.verifStatus}</p><p><b>Submitted:</b> {display("submittedAt", selected.submittedAt)}</p>
